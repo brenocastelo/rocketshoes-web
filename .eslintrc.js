@@ -30,5 +30,7 @@ module.exports = {
     'jsx-a11y/label-has-associated-control': [0],
     'no-console': ['error', { allow: ['tron'] }],
     'no-param-reassign': 'off',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
   },
 };
