@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { MdAddShoppingCart } from 'react-icons/md';
-import { connect } from 'react-redux';
-import { bindActionCreators } from 'redux';
+import { useSelector, useDispatch } from 'react-redux';
 
-import * as CartActions from '../../store/modules/cart/actions';
+import { addToCartRequest } from '../../store/modules/cart/actions';
 import api from '../../services/api';
 import { formatPrice } from '../../utils/formats';
 
 import { ProductList } from './styles';
 
-function Home({ addToCartRequest, amount }) {
+export default function Home() {
   const [products, setProducts] = useState([]);
+  const dispatch = useDispatch();
+
+  const productAmount = useSelector(state =>
+    state.cart.reduce((amount, product) => {
+      amount[product.id] = product.amount;
+
+      return amount;
+    }, {})
+  );
 
   useEffect(() => {
     async function loadProducts() {
@@ -38,10 +46,13 @@ function Home({ addToCartRequest, amount }) {
           <strong>{product.title}</strong>
           <span>{product.formattedPrice}</span>
 
-          <button type="button" onClick={() => addToCartRequest(product.id)}>
+          <button
+            type="button"
+            onClick={() => dispatch(addToCartRequest(product.id))}
+          >
             <div>
               <MdAddShoppingCart />
-              {amount[product.id] || 0}
+              {productAmount[product.id] || 0}
             </div>
             <span>ADICIONAR AO CARRINHO</span>
           </button>
@@ -50,19 +61,3 @@ function Home({ addToCartRequest, amount }) {
     </ProductList>
   );
 }
-
-const mapStateToProps = state => ({
-  amount: state.cart.reduce((amount, product) => {
-    amount[product.id] = product.amount;
-
-    return amount;
-  }, {}),
-});
-
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(CartActions, dispatch);
-/**
- * connect vai conectar o componente ao redux
- * o seu retorno é uma função que é chamada passando o componente
- * */
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
